@@ -1,0 +1,105 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <math.h>
+
+using namespace std;
+
+class RaceHorse {
+private:
+    string name;
+    int age;
+    double speed;
+    int place_in_race;
+public:
+    string get_name() const {
+        return name;
+    }
+    int get_age() const {
+        return age;
+    }
+    double get_speed() const {
+        return speed;
+    }
+    void set_place(int place) {
+        place_in_race = place;
+    }
+    double get_place() const {
+        return place_in_race;
+    }
+    RaceHorse(string name, double speed, int age) :name(name), speed(speed), age(age) {};
+};
+
+void Print(RaceHorse horse) {
+    cout << "Name: " << horse.get_name() << " age: " << horse.get_age() << " speed: " << horse.get_speed() << endl;
+}
+
+bool operator == (const RaceHorse& horse1, const RaceHorse& horse2) {
+    return horse1.get_name() == horse2.get_name() && horse1.get_age() == horse2.get_age() && horse1.get_speed() == horse2.get_speed();
+}
+
+bool compare_speed(RaceHorse horse1, RaceHorse horse2) {
+    if (horse1.get_speed() == horse2.get_speed()) {
+        if (horse1.get_age() == horse2.get_age()) {
+            return horse1.get_name() > horse2.get_name();
+        }
+        return horse1.get_age() > horse2.get_age();
+    }
+    return horse1.get_speed() > horse2.get_speed();
+}
+class Race {
+private:
+    vector<RaceHorse> horses;
+public:
+
+    int NumberOfHorses() {
+        return horses.size();
+    }
+    bool AddHorse(RaceHorse horse) {
+        int age = horse.get_age();
+        if (3 <= age && age <= 7) {
+            horses.push_back(horse);
+            return 1;
+        }
+        else {
+            cout << "Can't add horse: " << horse.get_age() << endl;
+            return 0;
+        }
+    }
+
+    void DeleteHorse(RaceHorse horse) {
+        horses.erase(remove(horses.begin(), horses.end(), horse), horses.end());
+    }
+
+    void StartRace() {
+
+        sort(horses.begin(), horses.end(), compare_speed);
+        if (horses.size() > 0) { cout << "1-st: " << horses[0].get_name() << endl; horses[0].set_place(1); }
+        if (horses.size() > 1) { cout << "2-nd: " << horses[1].get_name() << endl; horses[1].set_place(2); }
+        if (horses.size() > 2) { cout << "3-rd: " << horses[2].get_name() << endl; horses[2].set_place(3); }
+        for (int i = 3; i < horses.size(); i++) {
+            cout << i + 1 << "-th: " << horses[i].get_name() << endl;
+            horses[i].set_place(i + 1);
+        }
+    }
+    RaceHorse getWinnerFastestHorse() {
+        sort(horses.begin(), horses.end(), compare_speed);
+        return horses[0];
+    }
+    RaceHorse getWinnerClosestAgeHorse() {
+        double average = 0, min = 100;
+        int closest_to_average_horse_id;
+        for (int i = 0; i < horses.size(); i++) {
+            average += horses[i].get_age();
+        }
+        average /= horses.size();
+        for (int i = 0; i < horses.size(); i++) {
+            if (fabs(horses[i].get_age() - average) < min) {
+                min = fabs(horses[i].get_age() - average);
+                closest_to_average_horse_id = i;
+            }
+        }
+        return horses [closest_to_average_horse_id];
+    }
+
+};
